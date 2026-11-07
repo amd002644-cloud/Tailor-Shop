@@ -11,11 +11,13 @@ workflows:
       - name: Extract Project Files
         script: |
           echo "Extracting project zip file..."
-          unzip -o Tailor_Shop_Login_Source.zip
+          unzip -o Tailor_Shop_Login_Source.zip -d .
+          ls -la
           
       - name: Setup Firebase Configuration
         script: |
           echo "Setting up Firebase google-services.json..."
+          mkdir -p customer_app/android/app
           echo "$ANDROID_FIREBASE_SECRET" > customer_app/android/app/google-services.json
           
       - name: Flutter Package Get
