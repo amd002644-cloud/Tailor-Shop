@@ -12,23 +12,33 @@ workflows:
         script: |
           echo "Extracting project zip file..."
           unzip -o Tailor_Shop_Login_Source.zip -d .
-          ls -la
+          # ফোল্ডারগুলো আসলে কোথায় আছে তা খোঁজা
+          find . -name "customer_app" -type d
           
       - name: Setup Firebase Configuration
         script: |
           echo "Setting up Firebase google-services.json..."
-          mkdir -p customer_app/android/app
-          echo "$ANDROID_FIREBASE_SECRET" > customer_app/android/app/google-services.json
+          # কাস্টমার অ্যাপের আসল লোকেশন খুঁজে বের করা
+          CUSTOMER_PATH=$(find . -name "customer_app" -type d | head -n 1)
+          if [ -z "$CUSTOMER_PATH" ]; then
+            echo "customer_app not found! Using root."
+            CUSTOMER_PATH="."
+          fi
+          echo "Found customer_app at: $CUSTOMER_PATH"
+          mkdir -p "$CUSTOMER_PATH/android/app"
+          echo "$ANDROID_FIREBASE_SECRET" > "$CUSTOMER_PATH/android/app/google-services.json"
+          # পরবর্তী স্ক্রিপ্টের সুবিধার্থে পাথটি সেভ করে রাখা
+          echo "export APP_PATH=$CUSTOMER_PATH" >> $CM_ENV
           
       - name: Flutter Package Get
         script: |
-          cd customer_app
+          cd $APP_PATH
           flutter packages pub get
           
       - name: Build Android APK
         script: |
-          cd customer_app
+          cd $APP_PATH
           flutter build apk --release
           
     artifacts:
-      - customer_app/build/app/outputs/flutter-apk/*.apk
+      - "**/build/app/outputs/flutter-apk/*.apk"
