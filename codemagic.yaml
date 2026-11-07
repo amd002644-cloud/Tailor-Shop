@@ -1,0 +1,32 @@
+workflows:
+  flutter-android-workflow:
+    name: Tailor Shop Android Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      groups:
+        - firebase
+      flutter: stable
+    scripts:
+      - name: Extract Project Files
+        script: |
+          echo "Extracting project zip file..."
+          unzip -o Tailor_Shop_Login_Source.zip
+          
+      - name: Setup Firebase Configuration
+        script: |
+          echo "Setting up Firebase google-services.json..."
+          echo "$ANDROID_FIREBASE_SECRET" > customer_app/android/app/google-services.json
+          
+      - name: Flutter Package Get
+        script: |
+          cd customer_app
+          flutter packages pub get
+          
+      - name: Build Android APK
+        script: |
+          cd customer_app
+          flutter build apk --release --no-sound-null-safety
+          
+    artifacts:
+      - customer_app/build/app/outputs/flutter-apk/*.apk
