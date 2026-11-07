@@ -6,7 +6,7 @@ workflows:
     environment:
       groups:
         - firebase
-      flutter: 3.0.5
+      flutter: 3.19.0
     scripts:
       - name: Extract Project Files
         script: |
@@ -23,13 +23,12 @@ workflows:
       - name: Flutter Package Get
         script: |
           cd customer_app
-          flutter packages pub get --legacy-peer-deps || flutter packages pub get
+          flutter packages pub get
           
       - name: Build Android APK
         script: |
           cd customer_app
-          # পুরনো অ্যান্ড্রয়েড এম্বেডিং সাপোর্ট করানোর ট্রিক
-          flutter build apk --release --no-sound-null-safety
+          flutter build apk --release
           
     artifacts:
       - customer_app/build/app/outputs/flutter-apk/*.apk
